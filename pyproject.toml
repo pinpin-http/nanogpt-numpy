@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanogpt-numpy"
+version = "0.1.0"
+description = "Un petit GPT au niveau caractère en NumPy pur, forward et backward écrits à la main."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Soheib Bouazzaoui" }]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy==2.5.4",
+    "matplotlib==3.11.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.2.0"]
+
+[project.urls]
+Repository = "https://github.com/pinpin-http/nanogpt-numpy"
+
+[tool.setuptools]
+packages = ["nanogpt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

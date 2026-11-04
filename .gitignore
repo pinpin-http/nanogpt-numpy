@@ -1,0 +1,12 @@
+# environnement
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# corpus téléchargé et checkpoints d'entraînement
+data/
+checkpoints/

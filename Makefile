@@ -11,7 +11,7 @@ SAMPLE_CKPT ?= models/miserables
 .PHONY: install test data baselines train report sample all
 
 install:
-	uv venv --python 3.12
+	test -d .venv || uv venv --python 3.12
 	uv pip install -e ".[dev]"
 
 test:

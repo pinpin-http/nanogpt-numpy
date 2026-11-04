@@ -12,42 +12,70 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
+SURFACE = "#fcfcfb"
+TEXT = "#0b0b0b"
+MUTED = "#52514e"
+GRID = "#e4e3df"
+TRAIN = "#2a78d6"
+VAL = "#eb6834"
+RAW = "#c9c8c3"
 
-def moving_average(x, w):
+
+def centered_average(x, w):
+    """Moyenne glissante centrée ; renvoie (indices, valeurs)."""
     x = np.asarray(x, dtype=float)
     if len(x) < w:
-        return x
-    return np.convolve(x, np.ones(w) / w, mode="valid")
+        return np.arange(len(x)), x
+    smooth = np.convolve(x, np.ones(w) / w, mode="valid")
+    start = (w - 1) // 2
+    return np.arange(start, start + len(smooth)), smooth
 
 
 def plot_history(history_path, out_path, results_path=None):
     history = json.loads(Path(history_path).read_text())
     results = json.loads(Path(results_path).read_text()) if results_path else None
     ln2 = math.log(2)
-
-    fig, ax = plt.subplots(figsize=(8, 4.5), dpi=120)
-    w = 25
-    smooth = moving_average(history["train_loss"], w)
-    ax.plot(history["iter"], np.asarray(history["train_loss"]) / ln2, color="#c9c9c9", lw=0.6, label="train (batch)")
-    ax.plot(history["iter"][w - 1 :], smooth / ln2, color="#1f5aa6", lw=1.4, label=f"train (moyenne sur {w} it.)")
+    iters = np.asarray(history["iter"])
+    raw = np.asarray(history["train_loss"]) / ln2
+    idx, smooth = centered_average(raw, 25)
     ev = history["eval"]
-    ax.plot([e["iter"] for e in ev], [e["val"] / ln2 for e in ev], "o-", color="#d1495b", ms=3, lw=1.4, label="val (estimation)")
+    ev_it = [e["iter"] for e in ev]
+    ev_val = [e["val"] / ln2 for e in ev]
+
+    plt.rcParams.update({"font.size": 9, "text.color": TEXT, "axes.labelcolor": MUTED})
+    fig, ax = plt.subplots(figsize=(8, 4.5), dpi=130, facecolor=SURFACE)
+    ax.set_facecolor(SURFACE)
+    ax.plot(iters, raw, color=RAW, lw=0.6, label="train, batch par batch")
+    ax.plot(iters[idx], smooth, color=TRAIN, lw=2, label="train, moyenne glissante (25 it.)")
+    ax.plot(ev_it, ev_val, "o-", color=VAL, ms=4, lw=2, label="val, estimation sur 16 batches")
+
+    x_end = iters[-1]
+    levels = [smooth.min(), min(ev_val)]
     if results:
         for key, label, style in (("unigram", "unigramme", ":"), ("bigram", "bigramme", "--")):
             b = results["baselines"][key]["bpc"]
-            ax.axhline(b, color="#555555", ls=style, lw=1)
-            ax.text(history["iter"][-1], b, f" {label} {b:.2f}", va="bottom", ha="right", fontsize=8, color="#555555")
+            levels.append(b)
+            ax.axhline(b, color=MUTED, ls=style, lw=1)
+            ax.text(x_end, b + 0.03, f"{label} {b:.2f} bpc", va="bottom", ha="right", color=MUTED)
         m = results["model"]["bpc"]
-        ax.axhline(m, color="#d1495b", ls="-.", lw=0.8)
-        ax.text(history["iter"][-1], m, f" val complète {m:.2f}", va="top", ha="right", fontsize=8, color="#d1495b")
+        levels.append(m)
+        ax.plot([x_end], [m], "D", color=VAL, ms=7, mec=SURFACE, mew=1.5, clip_on=False, zorder=5)
+        ax.text(x_end, m - 0.05, f"val complète, fin : {m:.2f} bpc", va="top", ha="right", color=MUTED)
+
+    # Le départ (~6,7 bpc, prédiction uniforme) écraserait le reste : on coupe à 5.
+    ax.set_ylim(min(levels) - 0.3, 5.0)
+    ax.set_xlim(0, x_end)
     ax.set_xlabel("itération")
     ax.set_ylabel("bits par caractère")
-    ax.set_ylim(bottom=max(0.0, min(smooth / ln2) - 0.3) if len(smooth) else 0)
-    ax.grid(alpha=0.25)
-    ax.legend(loc="upper right", fontsize=8)
-    ax.set_title("nanogpt-numpy sur Les Misérables")
+    ax.grid(color=GRID, lw=0.6)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(GRID)
+    ax.tick_params(colors=MUTED)
+    ax.legend(loc="lower left", frameon=False)
     fig.tight_layout()
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path)
+    fig.savefig(out_path, facecolor=SURFACE)
     plt.close(fig)
     return out_path

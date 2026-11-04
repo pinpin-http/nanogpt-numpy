@@ -2,9 +2,9 @@
 
 Convention : `forward` garde en mémoire ce dont `backward` a besoin, et
 `backward(dout)` renvoie le gradient par rapport à l'entrée tout en
-*accumulant* les gradients des paramètres dans `self.grads`. L'accumulation
-permet de partager un poids entre deux usages (embeddings liés à la tête de
-sortie). Il faut donc appeler `zero_grad()` avant chaque passe.
+*accumulant* les gradients des paramètres dans `self.grads`. Grâce à
+l'accumulation, un même poids peut servir à deux endroits (embeddings liés à
+la tête de sortie). Il faut donc appeler `zero_grad()` avant chaque passe.
 """
 
 from __future__ import annotations

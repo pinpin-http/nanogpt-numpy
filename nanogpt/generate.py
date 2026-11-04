@@ -48,14 +48,14 @@ def generate(
     if use_cache:
         cache = model.new_cache()
         logits = model.forward_cached(np.array([tokens[-block_size:]]), cache)[0, -1]
-    for _ in range(max_new_tokens):
+    for step in range(max_new_tokens):
         if not use_cache:
             logits = model.forward(np.array([tokens[-block_size:]]))[0][0, -1]
         if return_logits:
             history.append(np.array(logits, copy=True))
         nxt = sample_next(logits, rng, temperature, top_k)
         tokens.append(nxt)
-        if use_cache:
+        if use_cache and step < max_new_tokens - 1:
             if model.cache_len(cache) >= block_size:
                 cache = model.new_cache()
                 logits = model.forward_cached(np.array([tokens[-(block_size // 2) :]]), cache)[0, -1]

@@ -4,8 +4,8 @@
   "vocab_size": 106,
   "stride": 64,
   "model": {
-    "nats": 1.6978994736547581,
-    "bpc": 2.4495511505697007
+    "nats": 1.177223680085186,
+    "bpc": 1.6983747652759535
   },
   "baselines": {
     "unigram": {
@@ -19,10 +19,10 @@
       "alpha": 0.01
     }
   },
-  "eval_time_s": 96.2412906870004,
+  "eval_time_s": 22.790256466000073,
   "num_params": 823296,
-  "iters_done": 796,
-  "train_time_s": 1516.156097264,
+  "iters_done": 5000,
+  "train_time_s": 4842.6419237810005,
   "train_config": {
     "block_size": 128,
     "n_layer": 4,
@@ -31,7 +31,7 @@
     "tie_weights": true,
     "batch_size": 32,
     "max_iters": 5000,
-    "time_budget_min": 25.0,
+    "time_budget_min": 0.0,
     "lr": 0.002,
     "min_lr": 0.0002,
     "warmup_iters": 100,
@@ -39,7 +39,7 @@
     "beta1": 0.9,
     "beta2": 0.95,
     "grad_clip": 1.0,
-    "eval_interval": 200,
+    "eval_interval": 250,
     "eval_batches": 16,
     "log_interval": 10,
     "seed": 1337,
@@ -47,7 +47,7 @@
     "out": "checkpoints/miserables"
   },
   "generation_chars_per_s": {
-    "avec_cache": 184.59547590814608,
-    "sans_cache": 42.45745842415628
+    "avec_cache": 1488.7775723282612,
+    "sans_cache": 192.28952291998115
   }
 }

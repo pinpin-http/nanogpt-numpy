@@ -25,8 +25,10 @@ class TrainConfig:
     tie_weights: bool = True
     # optimisation
     batch_size: int = 32
-    max_iters: int = 5000  # plafond ; en pratique c'est souvent le budget de temps qui arrête
-    time_budget_min: float = 25.0  # 0 pour un entraînement piloté par max_iters seul
+    max_iters: int = 5000
+    # Budget de temps en minutes. À 0 (défaut), seul max_iters arrête
+    # l'entraînement, qui est alors reproductible au pas près.
+    time_budget_min: float = 0.0
     lr: float = 2e-3
     min_lr: float = 2e-4
     warmup_iters: int = 100
@@ -35,7 +37,7 @@ class TrainConfig:
     beta2: float = 0.95
     grad_clip: float = 1.0
     # suivi
-    eval_interval: int = 200
+    eval_interval: int = 250
     eval_batches: int = 16
     log_interval: int = 10
     seed: int = 1337
